@@ -1,4 +1,5 @@
 import json
+from scipy.ndimage import gaussian_filter1d
 
 def clean_trajectory(input_file, output_file):
     """
@@ -22,11 +23,16 @@ def clean_trajectory(input_file, output_file):
         if not cleaned_trajectory or not states_are_similar(state, cleaned_trajectory[-1]):
             cleaned_trajectory.append(state)
 
-    # Save the cleaned trajectory to the output file
-    with open(output_file, 'w') as f:
-        json.dump(cleaned_trajectory, f, indent=4)
+    # Smooth the cleaned trajectory
+    smoothed_trajectory = smooth_trajectory(cleaned_trajectory, sigma=2)
 
-def states_are_similar(state1, state2, threshold=1e-5):
+    # Save the smoothed trajectory to the output file
+    with open(output_file, 'w') as f:
+        json.dump(smoothed_trajectory, f, indent=4)
+
+    print(f"Smoothed trajectory saved to {output_file}")
+
+def states_are_similar(state1, state2, threshold=1e-4):
     """
     Compares two states and determines if they are similar within a given threshold.
 
@@ -54,8 +60,38 @@ def states_are_similar(state1, state2, threshold=1e-5):
                     return False
     return True
 
+def smooth_trajectory(trajectory, sigma=1):
+    """
+    Smooths the trajectory using a Gaussian filter.
+
+    Args:
+        trajectory (list): The trajectory data to smooth.
+        sigma (float): The standard deviation for Gaussian kernel.
+
+    Returns:
+        list: The smoothed trajectory.
+    """
+    smoothed_trajectory = []
+
+    # Extract and smooth each component of the trajectory
+    positions = [state['end_effector_position'] for state in trajectory]
+    x = [pos[0] for pos in positions]
+    y = [pos[1] for pos in positions]
+    z = [pos[2] for pos in positions]
+
+    x_smooth = gaussian_filter1d(x, sigma)
+    y_smooth = gaussian_filter1d(y, sigma)
+    z_smooth = gaussian_filter1d(z, sigma)
+
+    for i, state in enumerate(trajectory):
+        smoothed_state = state.copy()
+        smoothed_state['end_effector_position'] = [x_smooth[i], y_smooth[i], z_smooth[i]]
+        smoothed_trajectory.append(smoothed_state)
+
+    return smoothed_trajectory
+
 if __name__ == "__main__":
-    input_file = "./trajectory/trajectory1.json"  # Replace with your input file path
+    input_file = "expert_trajectory.json"  # Replace with your input file path
     output_file = "cleaned_trajectory.json"  # Replace with your desired output file path
     
     tra_before = json.load(open(input_file, "r"))
@@ -64,4 +100,3 @@ if __name__ == "__main__":
     clean_trajectory(input_file, output_file)
     tra_after=json.load(open(output_file, "r"))
     print(f"时间步数量：{len(tra_after)}")
-    print(f"Cleaned trajectory saved to {output_file}")
