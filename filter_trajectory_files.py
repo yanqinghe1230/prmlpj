@@ -43,32 +43,8 @@ def filter_trajectory_files(directory, max_steps=1000):
     
     print(f"\n总结: 删除了 {deleted_count} 个文件，保留了 {kept_count} 个文件。")
 
-def rename_trajectory_files(directory):
-    """
-    Renames all JSON files in the directory to a sequential order (1.json, 2.json, etc.).
-
-    Args:
-        directory (str): The directory containing trajectory JSON files.
-    """
-    trajectory_dir = Path(directory)
-
-    if not trajectory_dir.exists():
-        print(f"Directory {directory} does not exist.")
-        return
-
-    json_files = sorted(trajectory_dir.glob("*.json"))
-
-    for i, json_file in enumerate(json_files, start=1):
-        new_name = trajectory_dir / f"trajectory_{i}.json"
-        try:
-            json_file.rename(new_name)
-            print(f"Renamed: {json_file.name} -> {new_name.name}")
-        except Exception as e:
-            print(f"Error renaming {json_file.name}: {e}")
-
 if __name__ == "__main__":
     directory = "./trajectory"  # Replace with your trajectory directory path
     max_steps = 1000  # Maximum allowed time steps
     
     filter_trajectory_files(directory, max_steps)
-    rename_trajectory_files(directory)
