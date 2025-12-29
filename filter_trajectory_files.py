@@ -44,7 +44,7 @@ def filter_trajectory_files(directory, max_steps=1000):
     print(f"\n总结: 删除了 {deleted_count} 个文件，保留了 {kept_count} 个文件。")
 
 if __name__ == "__main__":
-    directory = "./trajectory"  # Replace with your trajectory directory path
+    directory = "./cleaned_trajectory"  # Replace with your trajectory directory path
     max_steps = 1000  # Maximum allowed time steps
     
     filter_trajectory_files(directory, max_steps)
