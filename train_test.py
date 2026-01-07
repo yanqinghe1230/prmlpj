@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 class MLPDataset(Dataset):
     """MLP使用：展开所有轨迹为(state, action)对"""
     
-    def __init__(self, trajectory_files, train=True):
+    def __init__(self, trajectory_files, train=True,norm_params=None):
         self.states = []
         self.actions = []
         
@@ -40,11 +40,16 @@ class MLPDataset(Dataset):
         self.actions = np.array(self.actions, dtype=np.float32)
         
         # 归一化（重要！）
-        if train:
+        if norm_params is not None:
             self.state_mean = self.states.mean(axis=0)
             self.state_std = self.states.std(axis=0) + 1e-8
             self.action_mean = self.actions.mean(axis=0)
             self.action_std = self.actions.std(axis=0) + 1e-8
+        else:
+            self.state_mean = norm_params['state_mean']
+            self.state_std = norm_params['state_std']
+            self.action_mean = norm_params['action_mean']
+            self.action_std = norm_params['action_std']
         
         self.states = (self.states - self.state_mean) / self.state_std
         self.actions = (self.actions - self.action_mean) / self.action_std
