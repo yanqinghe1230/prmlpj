@@ -40,7 +40,7 @@ class MLPDataset(Dataset):
         self.actions = np.array(self.actions, dtype=np.float32)
         
         # 归一化（重要！）
-        if norm_params is not None:
+        if norm_params is None:
             self.state_mean = self.states.mean(axis=0)
             self.state_std = self.states.std(axis=0) + 1e-8
             self.action_mean = self.actions.mean(axis=0)
@@ -53,7 +53,7 @@ class MLPDataset(Dataset):
         
         self.states = (self.states - self.state_mean) / self.state_std
         self.actions = (self.actions - self.action_mean) / self.action_std
-        
+
         print(f"Dataset: {len(self.states)} samples, "
               f"State dim: {self.states.shape[1]}, Action dim: {self.actions.shape[1]}")
     
@@ -196,13 +196,18 @@ def train_model(model, train_loader, val_loader, num_epochs=200, lr=1e-3, device
     
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-        optimizer, mode='min', factor=0.5, patience=10, verbose=True
+        optimizer, mode='min', factor=0.5, patience=10
     )
     criterion = nn.MSELoss()
     
     best_val_loss = float('inf')
     train_losses = []
     val_losses = []
+    
+    # 手动打印学习率变化
+    def print_lr(optimizer):
+        for param_group in optimizer.param_groups:
+            print(f"Learning rate: {param_group['lr']}")
     
     for epoch in range(num_epochs):
         # 训练
@@ -243,6 +248,7 @@ def train_model(model, train_loader, val_loader, num_epochs=200, lr=1e-3, device
         val_losses.append(val_loss)
         
         scheduler.step(val_loss)
+        #print_lr(optimizer)
         
         # 保存最佳模型
         if val_loss < best_val_loss:
@@ -285,7 +291,7 @@ def main():
     print(f"Using device: {device}")
     
     # 加载数据
-    trajectory_dir = Path('cleaned_trajectories')  # 你的轨迹文件夹
+    trajectory_dir = Path('./cleaned_trajectory')
     trajectory_files = sorted(list(trajectory_dir.glob('*.json')))
     
     print(f"Found {len(trajectory_files)} trajectories")
@@ -321,14 +327,14 @@ def main():
         
     else:
         print("\n=== 使用MLP模型 ===")
-        train_dataset = MLPDataset(train_files, train=True)
-        val_dataset = MLPDataset(val_files, train=False)
-        
-        # 使用训练集的归一化参数
-        val_dataset.state_mean = train_dataset.state_mean
-        val_dataset.state_std = train_dataset.state_std
-        val_dataset.action_mean = train_dataset.action_mean
-        val_dataset.action_std = train_dataset.action_std
+        train_dataset = MLPDataset(train_files, train=True,norm_params=None)
+        norm_params = {
+            'state_mean': train_dataset.state_mean,
+            'state_std': train_dataset.state_std,
+            'action_mean': train_dataset.action_mean,
+            'action_std': train_dataset.action_std
+        }
+        val_dataset = MLPDataset(val_files, train=False,norm_params=norm_params)    
         
         train_loader = DataLoader(train_dataset, batch_size=256, shuffle=True)
         val_loader = DataLoader(val_dataset, batch_size=256, shuffle=False)
