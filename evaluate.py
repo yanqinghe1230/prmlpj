@@ -351,7 +351,7 @@ class PolicyEvaluator:
         
         return 'unknown'
     
-    def evaluate(self, num_episodes=50, render_first=5, save_failed=True):
+    def evaluate(self, num_episodes=50, render_first=5, save_failed=False):
         print(f"\n{'='*70}")
         print(f"开始评估: {num_episodes} episodes")
         print(f"{'='*70}\n")
@@ -501,22 +501,23 @@ def main():
     statistics = evaluator.evaluate(
         num_episodes=NUM_EPISODES,
         render_first=RENDER_FIRST,
-        save_failed=True
+        save_failed=False
     )
     
+    '''
     # 保存结果
     print("\n5. 保存结果...")
     with open('evaluation_statistics.json', 'w') as f:
         json.dump(statistics, f, indent=2)
-    
+    '''
     # 关闭环境
     env.close()
     
     print("\n✓ 评估完成！")
     print("结果文件:")
     #print("  - evaluation_results.png: 可视化")
-    print("  - evaluation_statistics.json: 统计数据")
-    print("  - failed_trajectories/: 失败案例")
+    #print("  - evaluation_statistics.json: 统计数据")
+    #print("  - failed_trajectories/: 失败案例")
 
 
 if __name__ == '__main__':
