@@ -67,7 +67,7 @@ class MLPDataset(Dataset):
 class LSTMDataset(Dataset):
     """LSTM使用：保持轨迹结构"""
     
-    def __init__(self, trajectory_files, history_len=10, train=True):
+    def __init__(self, trajectory_files, history_len=10, train=True,norm_params=None):
         """
         Args:
             history_len: 使用多少历史步作为输入
@@ -102,11 +102,16 @@ class LSTMDataset(Dataset):
         all_states = np.concatenate([t['states'] for t in self.trajectories])
         all_actions = np.concatenate([t['actions'] for t in self.trajectories])
         
-        if train:
+        if norm_params is None:
             self.state_mean = all_states.mean(axis=0)
             self.state_std = all_states.std(axis=0) + 1e-8
             self.action_mean = all_actions.mean(axis=0)
             self.action_std = all_actions.std(axis=0) + 1e-8
+        else:
+            self.state_mean = norm_params['state_mean']
+            self.state_std = norm_params['state_std']
+            self.action_mean = norm_params['action_mean']
+            self.action_std = norm_params['action_std']
         
         for traj in self.trajectories:
             traj['states'] = (traj['states'] - self.state_mean) / self.state_std
@@ -285,7 +290,7 @@ def train_model(model, train_loader, val_loader, num_epochs=200, lr=1e-3, device
 
 def main():
     # 配置
-    USE_LSTM = False  # 设为True使用LSTM，False使用MLP
+    USE_LSTM = True  # 设为True使用LSTM，False使用MLP
     
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
     print(f"Using device: {device}")
@@ -306,14 +311,14 @@ def main():
     # 创建数据集和加载器
     if USE_LSTM:
         print("\n=== 使用LSTM模型 ===")
-        train_dataset = LSTMDataset(train_files, history_len=10, train=True)
-        val_dataset = LSTMDataset(val_files, history_len=10, train=False)
-        
-        # 使用训练集的归一化参数
-        val_dataset.state_mean = train_dataset.state_mean
-        val_dataset.state_std = train_dataset.state_std
-        val_dataset.action_mean = train_dataset.action_mean
-        val_dataset.action_std = train_dataset.action_std
+        train_dataset = LSTMDataset(train_files, history_len=10, train=True,norm_params=None)
+        norm_params = {
+            'state_mean': train_dataset.state_mean,
+            'state_std': train_dataset.state_std,
+            'action_mean': train_dataset.action_mean,
+            'action_std': train_dataset.action_std
+        }
+        val_dataset = LSTMDataset(val_files, history_len=10, train=False,norm_params=norm_params)
         
         train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
         val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
