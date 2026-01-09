@@ -67,7 +67,7 @@ class MLPDataset(Dataset):
 class LSTMDataset(Dataset):
     """LSTM使用：保持轨迹结构"""
     
-    def __init__(self, trajectory_files, history_len=10, train=True,norm_params=None):
+    def __init__(self, trajectory_files, history_len=30, train=True,norm_params=None):
         """
         Args:
             history_len: 使用多少历史步作为输入
@@ -79,9 +79,9 @@ class LSTMDataset(Dataset):
             with open(file_path, 'r') as f:
                 trajectory = json.load(f)
             
-            # 提取状态和动作序列
             states = []
             actions = []
+            next_ee_positions = []
             for i in range(len(trajectory) - 1):
                 state = np.concatenate([
                     trajectory[i]['joint_positions'],
@@ -90,12 +90,15 @@ class LSTMDataset(Dataset):
                     trajectory[i]['end_effector_orientation']
                 ])
                 action = np.array(trajectory[i + 1]['joint_velocities'])
+                next_ee_pos = np.array(trajectory[i + 1]['end_effector_position'])
                 states.append(state)
                 actions.append(action)
+                next_ee_positions.append(next_ee_pos)
             
             self.trajectories.append({
                 'states': np.array(states, dtype=np.float32),
-                'actions': np.array(actions, dtype=np.float32)
+                'actions': np.array(actions, dtype=np.float32),
+                'next_ee_positions': np.array(next_ee_positions, dtype=np.float32)
             })
         
         # 归一化
@@ -117,13 +120,14 @@ class LSTMDataset(Dataset):
             traj['states'] = (traj['states'] - self.state_mean) / self.state_std
             traj['actions'] = (traj['actions'] - self.action_mean) / self.action_std
         
-        # 创建(history, action)对
+        # 创建(history, action, next_ee_pos)对
         self.samples = []
         for traj in self.trajectories:
-            for i in range(self.history_len, len(traj['states'])):
+            for i in range(self.history_len, len(traj['states']) + 1):
                 history = traj['states'][i-self.history_len:i]  # (history_len, state_dim)
-                action = traj['actions'][i]
-                self.samples.append((history, action))
+                action = traj['actions'][i-1]
+                next_ee_pos = traj['next_ee_positions'][i-1]
+                self.samples.append((history, action, next_ee_pos))
         
         print(f"LSTM Dataset: {len(self.samples)} samples with history_len={history_len}")
     
@@ -196,7 +200,7 @@ class LSTMPolicy(nn.Module):
 # 训练函数
 # ============================================================================
 
-def train_model(model, train_loader, val_loader, num_epochs=200, lr=1e-3, device='cuda'):
+def train_model(model, train_loader, val_loader, num_epochs=200, lr=1e-3, device='cuda', include_goal_loss=False):
     """通用训练函数"""
     
     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=1e-5)
@@ -213,18 +217,59 @@ def train_model(model, train_loader, val_loader, num_epochs=200, lr=1e-3, device
     def print_lr(optimizer):
         for param_group in optimizer.param_groups:
             print(f"Learning rate: {param_group['lr']}")
+            
+    # 噪声 Curriculum 配置
+    NOISE_START_EPOCH = 10
+    NOISE_RAMP_EPOCHS = 40
+    MAX_NOISE_STD = 0.02 
+
+    print(f"训练开始 (Curriculum Noise: Start Ep={NOISE_START_EPOCH}, Ramp={NOISE_RAMP_EPOCHS}, MaxStd={MAX_NOISE_STD})")
+    
+    # 仅用于LSTM：目标按钮位置和权重λ
+    if include_goal_loss:
+        GOAL_POSITION = torch.tensor([0.5, 0.5, 0.05], dtype=torch.float32, device=device)
+        LAMBDA_GOAL = 0.1
     
     for epoch in range(num_epochs):
         # 训练
         model.train()
         train_loss = 0
+        
+        # 计算当前 Epoch 的噪声强度
+        if epoch < NOISE_START_EPOCH:
+            current_noise = 0.0
+        else:
+            progress = min(1.0, (epoch - NOISE_START_EPOCH) / NOISE_RAMP_EPOCHS)
+            current_noise = progress * MAX_NOISE_STD
+        
         for batch in train_loader:
-            states, actions = batch
+            # LSTM批 (history, action, next_ee_pos) 或 MLP批 (state, action)
+            if isinstance(batch, (list, tuple)) and len(batch) == 3:
+                states, actions, next_ee_pos = batch
+                next_ee_pos = next_ee_pos.to(device)
+            else:
+                states, actions = batch
+                next_ee_pos = None
             states = states.to(device)
             actions = actions.to(device)
             
+            # Curriculum Noise Injection: 给输入状态加噪声模拟闭环偏移
+            if current_noise > 0:
+                noise = torch.randn_like(states) * current_noise
+                states = states + noise
+            
             pred_actions = model(states)
-            loss = criterion(pred_actions, actions)
+            # 加权MSE：用下一时刻末端到目标的距离作为样本权重
+            if include_goal_loss and (next_ee_pos is not None):
+                # 距离 (batch,)
+                dist = torch.norm(next_ee_pos - GOAL_POSITION.unsqueeze(0), dim=1)
+                # 权重：1 + λ·distance  （可按需裁剪）
+                weights = 1.0 + LAMBDA_GOAL * dist
+                # 每样本 MSE（对动作维度取均值）
+                mse_per_sample = ((pred_actions - actions) ** 2).mean(dim=1)
+                loss = (weights * mse_per_sample).mean()
+            else:
+                loss = criterion(pred_actions, actions)
             
             optimizer.zero_grad()
             loss.backward()
@@ -241,12 +286,23 @@ def train_model(model, train_loader, val_loader, num_epochs=200, lr=1e-3, device
         val_loss = 0
         with torch.no_grad():
             for batch in val_loader:
-                states, actions = batch
+                if isinstance(batch, (list, tuple)) and len(batch) == 3:
+                    states, actions, next_ee_pos = batch
+                    next_ee_pos = next_ee_pos.to(device)
+                else:
+                    states, actions = batch
+                    next_ee_pos = None
                 states = states.to(device)
                 actions = actions.to(device)
                 
                 pred_actions = model(states)
-                loss = criterion(pred_actions, actions)
+                if include_goal_loss and (next_ee_pos is not None):
+                    dist = torch.norm(next_ee_pos - GOAL_POSITION.unsqueeze(0), dim=1)
+                    weights = 1.0 + LAMBDA_GOAL * dist
+                    mse_per_sample = ((pred_actions - actions) ** 2).mean(dim=1)
+                    loss = (weights * mse_per_sample).mean()
+                else:
+                    loss = criterion(pred_actions, actions)
                 val_loss += loss.item()
         
         val_loss /= len(val_loader)
@@ -311,14 +367,14 @@ def main():
     # 创建数据集和加载器
     if USE_LSTM:
         print("\n=== 使用LSTM模型 ===")
-        train_dataset = LSTMDataset(train_files, history_len=10, train=True,norm_params=None)
+        train_dataset = LSTMDataset(train_files, history_len=15, train=True,norm_params=None)
         norm_params = {
             'state_mean': train_dataset.state_mean,
             'state_std': train_dataset.state_std,
             'action_mean': train_dataset.action_mean,
             'action_std': train_dataset.action_std
         }
-        val_dataset = LSTMDataset(val_files, history_len=10, train=False,norm_params=norm_params)
+        val_dataset = LSTMDataset(val_files, history_len=15, train=False,norm_params=norm_params)
         
         train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
         val_loader = DataLoader(val_dataset, batch_size=64, shuffle=False)
@@ -359,7 +415,8 @@ def main():
         val_loader,
         num_epochs=200,
         lr=1e-3,
-        device=device
+        device=device,
+        include_goal_loss=USE_LSTM  # 仅在LSTM训练时加入距离损失
     )
     
     print(f"\n训练完成！最佳验证损失: {best_val_loss:.6f}")

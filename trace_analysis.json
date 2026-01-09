@@ -1,0 +1,523 @@
+{
+  "summary": {
+    "N": 50,
+    "basin_entry_fraction": 0.34,
+    "entered_median_time": 78.0,
+    "entered_iqr_time": [
+      75.0,
+      105.0
+    ],
+    "min_distance_median": 0.2197255864739418,
+    "min_distance_iqr": [
+      0.1682322546839714,
+      0.3140377551317215
+    ],
+    "contact_fraction": 0.12,
+    "median_contact_time": 93,
+    "succ_and_enter_frac": 0.12,
+    "enter_but_not_succ_frac": 0.22,
+    "succ_but_not_enter_frac": 0.0
+  },
+  "per_episode": [
+    {
+      "entered_basin": true,
+      "time_to_basin": 106,
+      "min_distance": 0.12093186378479004,
+      "time_of_min": 116,
+      "contact_time": null,
+      "success": false,
+      "steps": 137,
+      "final_distance": 0.4055272037833239
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 75,
+      "min_distance": 0.10266818106174469,
+      "time_of_min": 83,
+      "contact_time": null,
+      "success": false,
+      "steps": 99,
+      "final_distance": 0.36808219650046975
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 75,
+      "min_distance": 0.12711940705776215,
+      "time_of_min": 84,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.5937576295748835
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.29560089111328125,
+      "time_of_min": 112,
+      "contact_time": null,
+      "success": false,
+      "steps": 454,
+      "final_distance": 0.44688249351087733
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.41074517369270325,
+      "time_of_min": 89,
+      "contact_time": null,
+      "success": false,
+      "steps": 971,
+      "final_distance": 0.6500836360340895
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.3327312767505646,
+      "time_of_min": 118,
+      "contact_time": null,
+      "success": false,
+      "steps": 201,
+      "final_distance": 0.6399161694613273
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.2727539837360382,
+      "time_of_min": 80,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 1.001564999405457
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.28701043128967285,
+      "time_of_min": 105,
+      "contact_time": null,
+      "success": false,
+      "steps": 933,
+      "final_distance": 0.7128670264333116
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.3807993233203888,
+      "time_of_min": 94,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.9636725159561812
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 126,
+      "min_distance": 0.16805541515350342,
+      "time_of_min": 133,
+      "contact_time": null,
+      "success": false,
+      "steps": 160,
+      "final_distance": 0.2855059237994513
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.25093474984169006,
+      "time_of_min": 102,
+      "contact_time": null,
+      "success": false,
+      "steps": 248,
+      "final_distance": 0.4590176670228881
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.28056901693344116,
+      "time_of_min": 123,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 1.0649426894068212
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.20362558960914612,
+      "time_of_min": 86,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.6552642691505307
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.23336224257946014,
+      "time_of_min": 76,
+      "contact_time": null,
+      "success": false,
+      "steps": 140,
+      "final_distance": 0.49325587508147467
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.22408239543437958,
+      "time_of_min": 61,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.9386174230435822
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.3549293279647827,
+      "time_of_min": 98,
+      "contact_time": null,
+      "success": false,
+      "steps": 167,
+      "final_distance": 0.4064389824923545
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 78,
+      "min_distance": 0.15449099242687225,
+      "time_of_min": 85,
+      "contact_time": null,
+      "success": false,
+      "steps": 121,
+      "final_distance": 0.3165391576655557
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 73,
+      "min_distance": 0.10046832263469696,
+      "time_of_min": 82,
+      "contact_time": 82,
+      "success": true,
+      "steps": 83,
+      "final_distance": 0.10046832305278888
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 90,
+      "min_distance": 0.18552760779857635,
+      "time_of_min": 93,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.6773188965948665
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.1971762478351593,
+      "time_of_min": 110,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.9306050342295222
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 105,
+      "min_distance": 0.10358881205320358,
+      "time_of_min": 128,
+      "contact_time": 128,
+      "success": true,
+      "steps": 129,
+      "final_distance": 0.10358881327921399
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.1857166439294815,
+      "time_of_min": 89,
+      "contact_time": null,
+      "success": false,
+      "steps": 950,
+      "final_distance": 0.7478221992810777
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.32133907079696655,
+      "time_of_min": 62,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.9834926271487914
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 100,
+      "min_distance": 0.17048726975917816,
+      "time_of_min": 116,
+      "contact_time": null,
+      "success": false,
+      "steps": 137,
+      "final_distance": 0.22441568762069045
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.21536877751350403,
+      "time_of_min": 77,
+      "contact_time": null,
+      "success": false,
+      "steps": 147,
+      "final_distance": 0.5475555150705639
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 130,
+      "min_distance": 0.15819557011127472,
+      "time_of_min": 135,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.8856894079115976
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.5426325798034668,
+      "time_of_min": 891,
+      "contact_time": null,
+      "success": false,
+      "steps": 949,
+      "final_distance": 0.7572158036488119
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.25785884261131287,
+      "time_of_min": 97,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 1.0497337352794527
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.35080841183662415,
+      "time_of_min": 119,
+      "contact_time": null,
+      "success": false,
+      "steps": 171,
+      "final_distance": 0.45609528227208823
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 107,
+      "min_distance": 0.11043455451726913,
+      "time_of_min": 117,
+      "contact_time": 117,
+      "success": true,
+      "steps": 118,
+      "final_distance": 0.11043455587765881
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 75,
+      "min_distance": 0.07741185277700424,
+      "time_of_min": 105,
+      "contact_time": 105,
+      "success": true,
+      "steps": 106,
+      "final_distance": 0.07741185643723963
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.23573094606399536,
+      "time_of_min": 89,
+      "contact_time": null,
+      "success": false,
+      "steps": 157,
+      "final_distance": 0.3888191555481314
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 70,
+      "min_distance": 0.10904430598020554,
+      "time_of_min": 80,
+      "contact_time": 80,
+      "success": true,
+      "steps": 81,
+      "final_distance": 0.1090443077402285
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.2354578971862793,
+      "time_of_min": 63,
+      "contact_time": null,
+      "success": false,
+      "steps": 433,
+      "final_distance": 0.6437012856120918
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.1858218014240265,
+      "time_of_min": 68,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 1.107411041747112
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.5111158490180969,
+      "time_of_min": 745,
+      "contact_time": null,
+      "success": false,
+      "steps": 830,
+      "final_distance": 0.7323321329701701
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.31897440552711487,
+      "time_of_min": 78,
+      "contact_time": null,
+      "success": false,
+      "steps": 265,
+      "final_distance": 0.5255765271029478
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.31469056010246277,
+      "time_of_min": 76,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 1.0048234981361743
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.3120793402194977,
+      "time_of_min": 101,
+      "contact_time": null,
+      "success": false,
+      "steps": 234,
+      "final_distance": 0.5849912345237891
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.28495898842811584,
+      "time_of_min": 64,
+      "contact_time": null,
+      "success": false,
+      "steps": 985,
+      "final_distance": 0.6994748044956117
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.4884926378726959,
+      "time_of_min": 66,
+      "contact_time": null,
+      "success": false,
+      "steps": 957,
+      "final_distance": 0.706635340897998
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 70,
+      "min_distance": 0.18810930848121643,
+      "time_of_min": 75,
+      "contact_time": null,
+      "success": false,
+      "steps": 120,
+      "final_distance": 0.4569221463383324
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 70,
+      "min_distance": 0.09541979432106018,
+      "time_of_min": 82,
+      "contact_time": 82,
+      "success": true,
+      "steps": 83,
+      "final_distance": 0.0954197919944552
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 89,
+      "min_distance": 0.1573183834552765,
+      "time_of_min": 96,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.998890571752922
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.20358052849769592,
+      "time_of_min": 107,
+      "contact_time": null,
+      "success": false,
+      "steps": 108,
+      "final_distance": 0.2035805324226026
+    },
+    {
+      "entered_basin": true,
+      "time_to_basin": 78,
+      "min_distance": 0.16876277327537537,
+      "time_of_min": 84,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.9083213647057364
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.3656671345233917,
+      "time_of_min": 267,
+      "contact_time": null,
+      "success": false,
+      "steps": 268,
+      "final_distance": 0.36566712018046416
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.17814978957176208,
+      "time_of_min": 96,
+      "contact_time": null,
+      "success": false,
+      "steps": 956,
+      "final_distance": 0.6026908843496519
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.19666583836078644,
+      "time_of_min": 96,
+      "contact_time": null,
+      "success": false,
+      "steps": 960,
+      "final_distance": 0.6738229353556799
+    },
+    {
+      "entered_basin": false,
+      "time_to_basin": null,
+      "min_distance": 0.32061898708343506,
+      "time_of_min": 131,
+      "contact_time": null,
+      "success": false,
+      "steps": 1000,
+      "final_distance": 0.7772111821552603
+    }
+  ]
+}

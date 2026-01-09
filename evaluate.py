@@ -209,10 +209,11 @@ class LSTMPolicy(nn.Module):
 
 
 class BCPolicyWrapper:
-    def __init__(self, model_path, device='cuda', history_len=10):
+    def __init__(self, model_path, device='cuda', history_len=30):
         self.device = device
         self.history_len = history_len
-        self.history_buffer = []  # 用于 LSTM 的历史状态 buffer
+        self.history_buffer = []
+        self.first_step = True
         
         checkpoint = torch.load(model_path, map_location=device, weights_only=False)
         
@@ -256,15 +257,17 @@ class BCPolicyWrapper:
         state_normalized = (state - self.state_mean) / self.state_std
         
         if self.is_lstm:
-            # 更新历史 buffer
+            # 先将当前状态加入 buffer
             self.history_buffer.append(state_normalized)
             if len(self.history_buffer) > self.history_len:
                 self.history_buffer.pop(0)
             
-            # 准备输入: 如果历史不足 history_len，用第一帧重复填充
-            current_history = list(self.history_buffer)
-            while len(current_history) < self.history_len:
-                current_history.insert(0, current_history[0])
+            # 然后构建 history
+            if len(self.history_buffer) < self.history_len:
+                # 不足 history_len 时，用第一个状态填充
+                current_history = [self.history_buffer[0]] * (self.history_len - len(self.history_buffer)) + list(self.history_buffer)
+            else:
+                current_history = list(self.history_buffer[-self.history_len:])
             
             input_tensor = np.array(current_history) # (seq_len, state_dim)
             input_tensor = torch.from_numpy(input_tensor).unsqueeze(0).to(self.device) # (1, seq_len, state_dim)
