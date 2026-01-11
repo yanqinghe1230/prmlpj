@@ -33,11 +33,11 @@ def visualize_trajectory(file_path):
     ax.legend()
 
     # Save the plot as an image
-    plt.savefig('trajectory_visualization_smooth.png')
+    plt.savefig('trajectory_visualization.png')
 
     # Show the plot
     #plt.show()
 
 if __name__ == "__main__":
-    file_path = "cleaned_trajectory.json"  # Replace with your trajectory file path
+    file_path = "../trajectory/trajectory_60.json"  
     visualize_trajectory(file_path)

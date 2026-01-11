@@ -12,7 +12,6 @@ import time
 from kuka_env import KukaButtonEnv
 
 class KukaButtonEnv:
-    """KUKA机械臂按按钮任务的仿真环境（简化版，完整版见上面的代码）"""
     
     def __init__(self, render=True, dt=1./60., max_steps=500):
         self.render_mode = render
@@ -478,7 +477,7 @@ class PolicyEvaluator:
 
 def main():
     # 配置
-    MODEL_PATH = 'best_model.pth'
+    MODEL_PATH = 'best_model_mlp.pth'
     NUM_EPISODES = 50
     RENDER_FIRST = 3  # 前3个episode显示GUI
     DEVICE = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -493,7 +492,7 @@ def main():
     
     # 创建环境
     print("\n2. 初始化环境...")
-    env = KukaButtonEnv(render=True, dt=1./60., max_steps=1000)
+    env = KukaButtonEnv(render=False, dt=1./60., max_steps=1000)
     
     # 创建评估器
     print("\n3. 创建评估器...")

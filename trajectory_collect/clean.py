@@ -9,7 +9,6 @@ def clean_trajectory(input_file, output_file,
                      sigma=2,
                      smooth_joints=True):
     """
-    改进的轨迹清洗函数
     
     Args:
         input_file: 输入JSON文件路径
@@ -25,30 +24,24 @@ def clean_trajectory(input_file, output_file,
     
     print(f"原始轨迹: {len(trajectory)} 步")
     
-    # 步骤1: 降采样
     if downsample_factor > 1:
         trajectory = trajectory[::downsample_factor]
         print(f"降采样后: {len(trajectory)} 步 (因子={downsample_factor})")
     
-    # 步骤2: 移除静止片段（可选）
     trajectory = remove_static_segments(trajectory, velocity_threshold)
     print(f"移除静止片段后: {len(trajectory)} 步")
     
-    # 步骤3: 移除相似的连续状态
     trajectory = remove_similar_states(trajectory, similarity_threshold)
     print(f"移除相似状态后: {len(trajectory)} 步")
     
-    # 步骤4: 高斯滤波平滑
     trajectory = smooth_trajectory(trajectory, sigma, smooth_joints)
     print(f"平滑后: {len(trajectory)} 步")
     
-    # 保存
     with open(output_file, 'w') as f:
         json.dump(trajectory, f, indent=4)
     
     print(f"\n清洗完成！保存到 {output_file}")
     
-    # 统计信息
     print_trajectory_stats(trajectory)
     
     return trajectory
@@ -77,7 +70,7 @@ def remove_static_segments(trajectory, velocity_threshold=1e-5):
 def remove_similar_states(trajectory, threshold=1e-3):
     """
     移除相似的连续状态
-    使用欧氏距离而非逐元素比较
+    使用欧氏距离
     """
     if len(trajectory) == 0:
         return trajectory
@@ -93,9 +86,8 @@ def remove_similar_states(trajectory, threshold=1e-3):
 
 def states_are_similar_euclidean(state1, state2, threshold=1e-3):
     """
-    使用欧氏距离判断状态相似度（更合理）
+    使用欧氏距离判断状态相似度
     """
-    # 提取所有数值特征
     vec1 = np.concatenate([
         state1['joint_positions'],
         state1['joint_velocities'],
@@ -179,62 +171,16 @@ def print_trajectory_stats(trajectory):
     print(f"接近静止的帧 (<1e-4): {np.sum(vel_norms < 1e-4)} ({np.sum(vel_norms < 1e-4)/len(trajectory)*100:.1f}%)")
 
 
-def visualize_cleaning_effect(input_file, output_file):
-    """可视化清洗效果对比"""
-    import matplotlib.pyplot as plt
-    
-    with open(input_file, 'r') as f:
-        original = json.load(f)
-    with open(output_file, 'r') as f:
-        cleaned = json.load(f)
-    
-    # 提取第一个关节的位置和速度
-    orig_pos = [s['joint_positions'][0] for s in original]
-    clean_pos = [s['joint_positions'][0] for s in cleaned]
-    
-    orig_vel = [s['joint_velocities'][0] for s in original]
-    clean_vel = [s['joint_velocities'][0] for s in cleaned]
-    
-    fig, axes = plt.subplots(2, 1, figsize=(14, 8))
-    
-    # 位置对比
-    axes[0].plot(orig_pos, alpha=0.6, label=f'原始 ({len(original)} 步)', linewidth=1)
-    axes[0].plot(clean_pos, label=f'清洗后 ({len(cleaned)} 步)', linewidth=2)
-    axes[0].set_ylabel('Joint 0 Position (rad)')
-    axes[0].set_title('清洗效果对比')
-    axes[0].legend()
-    axes[0].grid(True, alpha=0.3)
-    
-    # 速度对比
-    axes[1].plot(orig_vel, alpha=0.6, label=f'原始', linewidth=1)
-    axes[1].plot(clean_vel, label=f'清洗后', linewidth=2)
-    axes[1].axhline(y=1e-4, color='r', linestyle='--', label='静止阈值 1e-4')
-    axes[1].set_xlabel('时间步')
-    axes[1].set_ylabel('Joint 0 Velocity (rad/s)')
-    axes[1].legend()
-    axes[1].grid(True, alpha=0.3)
-    axes[1].set_yscale('symlog', linthresh=1e-5)
-    
-    plt.tight_layout()
-    plt.savefig('cleaning_comparison.png', dpi=150)
-    plt.show()
-    print("\n对比图已保存到 cleaning_comparison.png")
-
-
 if __name__ == "__main__":
     input_file = "./trajectory/trajectory_1.json"
     output_file = "cleaned_trajectory.json"
     
-    # 推荐的参数设置
     trajectory = clean_trajectory(
         input_file, 
         output_file,
-        similarity_threshold=1e-3,    # 比1e-4宽松，更容易删除相似帧
-        velocity_threshold=5e-5,       # 删除几乎静止的片段
-        downsample_factor=2,           # 120Hz -> 60Hz
-        sigma=2,                       # 适度平滑
-        smooth_joints=True             # 平滑所有数据
+        similarity_threshold=1e-3,    
+        velocity_threshold=5e-5,       
+        downsample_factor=2,          
+        sigma=2,                       
+        smooth_joints=True    
     )
-    
-    # 可视化效果（可选）
-    visualize_cleaning_effect(input_file, output_file)

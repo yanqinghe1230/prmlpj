@@ -39,7 +39,7 @@ class MLPDataset(Dataset):
         self.states = np.array(self.states, dtype=np.float32)
         self.actions = np.array(self.actions, dtype=np.float32)
         
-        # 归一化（重要！）
+        # 归一化
         if norm_params is None:
             self.state_mean = self.states.mean(axis=0)
             self.state_std = self.states.std(axis=0) + 1e-8
@@ -212,11 +212,6 @@ def train_model(model, train_loader, val_loader, num_epochs=200, lr=1e-3, device
     best_val_loss = float('inf')
     train_losses = []
     val_losses = []
-    
-    # 手动打印学习率变化
-    def print_lr(optimizer):
-        for param_group in optimizer.param_groups:
-            print(f"Learning rate: {param_group['lr']}")
             
     # 噪声 Curriculum 配置
     NOISE_START_EPOCH = 10
